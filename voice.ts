@@ -7,7 +7,7 @@ export async function textToVoice(text: string, filename: string) {
         model: "tts-1-hd",
         voice: "shimmer",
         input: text,
-        speed: 1.25,
+        speed: 1.15,
     });
 
     const buffer = Buffer.from(await mp3.arrayBuffer());
