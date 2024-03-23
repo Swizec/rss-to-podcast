@@ -3,8 +3,20 @@ import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
 import { imageToText } from "./vision";
+import { textToVoice } from "./voice";
 
-function imagesToText() {
+async function imageNodeToText(node) {
+    const text = await imageToText(node.url, node.alt);
+    node.type = "paragraph";
+    node.children = [
+        {
+            type: "text",
+            value: `Embedded image: ${text} End image`,
+        },
+    ];
+}
+
+function remarkImagesToText() {
     return async (ast) => {
         const images = [];
         visit(ast, "image", (node) => {
@@ -12,13 +24,8 @@ function imagesToText() {
         });
 
         const promises = [];
-        for (const { url } of images) {
-            promises.push(
-                (async () => {
-                    const text = await imageToText(url);
-                    console.log(text);
-                })()
-            );
+        for (const image of images) {
+            promises.push(imageNodeToText(image));
         }
 
         await Promise.all(promises);
@@ -28,11 +35,16 @@ function imagesToText() {
 async function markdownToVoice(markdown: string) {
     const file = await unified()
         .use(remarkParse)
-        .use(imagesToText)
+        .use(remarkImagesToText)
         .use(remarkStringify)
+        // .use(() => (ast) => {
+        //     visit(ast, "paragraph", (node) => {
+        //         console.log(node);
+        //     });
+        // })
         .process(markdown);
 
-    // console.log(String(file));
+    textToVoice(String(file));
 }
 
 const markdown = await Bun.file("./test.md").text();

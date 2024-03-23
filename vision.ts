@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI();
 
-export async function imageToText(url: string) {
+export async function imageToText(url: string, alt?: string) {
     const response = await openai.chat.completions.create({
         model: "gpt-4-vision-preview",
         messages: [
@@ -11,7 +11,9 @@ export async function imageToText(url: string) {
                 content: [
                     {
                         type: "text",
-                        text: "Very shortly describe this image for a blind person",
+                        text: alt
+                            ? `Write a short 2-sentence description of this image for a blind person. The alt is: ${alt}`
+                            : "Write a short 2-sentence description of this image for a blind person",
                     },
                     { type: "image_url", image_url: { url } },
                 ],

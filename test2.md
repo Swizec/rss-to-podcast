@@ -1,0 +1,1 @@
+![An Otto engine built in the U.S. in the 1880s.](https://technicshistory.files.wordpress.com/2024/03/psm_v18_d500_an_american_internal_combustion_otto_engine.jpg?w=2046)
