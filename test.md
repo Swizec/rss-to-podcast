@@ -1,5 +1,6 @@
-![](https://journals.plos.org/plosone/article/figure/image?size=large&id=10.1371/journal.pone.0299765.g001)
+# Twilight of the Steam Age, Part 1: Internal Combustion
 
+![](https://technicshistory.files.wordpress.com/2024/03/crossley-otto-gas-engine-1.jpg)
 
 Here in the early decades of the twenty-first century, steam turbines can still be found (though they are almost never seen) but steam piston engines are archaic relics. Nearly every moving machine that we see—cars, trucks, lawnmowers, the aircraft in the sky and the boats in the water—derives its power directly from the combustion of a fuel (such as gasoline) inside of a piston: internal combustion, unlike the external combustion that produces steam from fuel burned outside the boiler.
 

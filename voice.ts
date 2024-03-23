@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI();
 
-async function textToVoice(text: string) {
+export async function textToVoice(text: string) {
     const mp3 = await openai.audio.speech.create({
         model: "tts-1-hd",
         voice: "shimmer",

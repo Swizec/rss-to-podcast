@@ -2,7 +2,7 @@ import OpenAI from "openai";
 
 const openai = new OpenAI();
 
-async function imageToText(url: string) {
+export async function imageToText(url: string) {
     const response = await openai.chat.completions.create({
         model: "gpt-4-vision-preview",
         messages: [
@@ -19,9 +19,5 @@ async function imageToText(url: string) {
         ],
     });
 
-    console.log(response.choices[0]);
+    return response.choices[0].message.content;
 }
-
-await imageToText(
-    "https://journals.plos.org/plosone/article/figure/image?size=large&id=10.1371/journal.pone.0299765.g001"
-);
