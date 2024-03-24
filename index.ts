@@ -2,8 +2,37 @@ import remarkParse from "remark-parse";
 import remarkStringify from "remark-stringify";
 import { unified } from "unified";
 import { visit } from "unist-util-visit";
+import ffmpeg from "fluent-ffmpeg";
 import { imageToText } from "./vision";
 import { textToVoice } from "./voice";
+
+async function mergeMP3Files(
+    files: string[],
+    outputFile: string
+): Promise<void> {
+    if (files.length === 0) {
+        throw new Error("No files to merge");
+    }
+
+    let command = ffmpeg();
+
+    // Add each MP3 file to the ffmpeg command
+    files.forEach((file) => {
+        command = command.input(file);
+    });
+
+    // Return a Promise that resolves when the merging is complete
+    return new Promise((resolve, reject) => {
+        command
+            .on("error", (err) => {
+                reject(err);
+            })
+            .on("end", () => {
+                resolve();
+            })
+            .mergeToFile(outputFile, "./temp2"); // Specify a temporary directory for processing
+    });
+}
 
 async function imageNodeToText(node) {
     const text = await imageToText(node.url, node.alt);
@@ -66,6 +95,7 @@ function splitMarkdownByTitleAndImage(markdown: string): MarkdownSection[] {
 
 async function markdownToVoice(markdown: string) {
     const sections = splitMarkdownByTitleAndImage(markdown);
+    const files: string[] = [];
 
     for await (const [i, section] of sections.entries()) {
         const text = `${section.title}${section.content}`;
@@ -77,8 +107,15 @@ async function markdownToVoice(markdown: string) {
 
         console.log(String(file).length);
 
-        textToVoice(String(file), `test-${i}.mp3`);
+        const filename = `./temp/markdownToVoice-${i}.mp3`;
+        console.log(filename);
+        textToVoice(String(file), filename);
+        files.push(filename);
     }
+
+    console.log("merging file");
+    console.log(files);
+    // mergeMP3Files(files, "./test.mp3");
 
     // for await (const [i, section] of sections.entries()) {
     //     const text = `${section.title}${section.content}`;
@@ -91,4 +128,22 @@ async function markdownToVoice(markdown: string) {
 
 const markdown = await Bun.file("./test.md").text();
 
-markdownToVoice(markdown);
+// markdownToVoice(markdown);
+const files = [
+    "./temp/markdownToVoice-0.mp3",
+    "./temp/markdownToVoice-1.mp3",
+    "./temp/markdownToVoice-2.mp3",
+    "./temp/markdownToVoice-3.mp3",
+    "./temp/markdownToVoice-4.mp3",
+    "./temp/markdownToVoice-5.mp3",
+    "./temp/markdownToVoice-6.mp3",
+    "./temp/markdownToVoice-7.mp3",
+    "./temp/markdownToVoice-8.mp3",
+    "./temp/markdownToVoice-9.mp3",
+    "./temp/markdownToVoice-10.mp3",
+    "./temp/markdownToVoice-11.mp3",
+    "./temp/markdownToVoice-12.mp3",
+    "./temp/markdownToVoice-13.mp3",
+    "./temp/markdownToVoice-14.mp3",
+];
+await mergeMP3Files(files, "./test.mp3");

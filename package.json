@@ -9,6 +9,8 @@
   },
   "type": "module",
   "dependencies": {
+    "@types/fluent-ffmpeg": "^2.1.24",
+    "fluent-ffmpeg": "^2.1.2",
     "openai": "^4.29.2",
     "remark": "^15.0.1",
     "remark-parse": "^11.0.0",
