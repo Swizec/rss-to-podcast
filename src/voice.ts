@@ -1,9 +1,10 @@
 import OpenAI from "openai";
 import path from "node:path";
-import remarkParse from "remark-parse";
-import remarkStringify from "remark-stringify";
-import { unified } from "unified";
-import { remarkImagesToText, splitMarkdownByTitleAndImage } from "./markdown";
+
+import {
+    markdownSectionToText,
+    splitMarkdownByTitleAndImage,
+} from "./markdown";
 
 const openai = new OpenAI();
 
@@ -25,19 +26,14 @@ export async function markdownToVoice(tempDir: string, markdown: string) {
 
     await Promise.all(
         sections.map(async (section, i) => {
-            const text = `${section.title}${section.content}`;
-            const file = await unified()
-                .use(remarkParse)
-                .use(remarkImagesToText)
-                .use(remarkStringify)
-                .process(text);
+            const text = await markdownSectionToText(section);
 
-            console.log(String(file).length);
+            console.log(text.length);
 
             const filename = path.join(tempDir, `markdownToVoice-${i}.mp3`);
             console.log(filename);
 
-            await textToVoice(String(file), filename);
+            await textToVoice(text, filename);
             files.push(filename);
         })
     );

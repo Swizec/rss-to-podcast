@@ -1,4 +1,9 @@
 import { visit } from "unist-util-visit";
+import { unified } from "unified";
+import rehypeParse from "rehype-parse";
+import remarkParse from "remark-parse";
+import remarkStringify from "remark-stringify";
+import rehypeRemark from "rehype-remark";
 import { imageToText } from "./vision";
 
 async function imageNodeToText(node) {
@@ -60,4 +65,25 @@ export function splitMarkdownByTitleAndImage(
     }
 
     return sections;
+}
+
+export async function htmlToMarkdown(html: string): Promise<string> {
+    const processor = unified()
+        .use(rehypeParse, { fragment: true, emitParseErrors: false })
+        .use(rehypeRemark)
+        .use(remarkStringify);
+
+    const file = await processor.process(html);
+    return String(file);
+}
+
+export async function markdownSectionToText(section: MarkdownSection) {
+    const text = `${section.title}${section.content}`;
+    return String(
+        await unified()
+            .use(remarkParse)
+            .use(remarkImagesToText)
+            .use(remarkStringify)
+            .process(text)
+    );
 }
