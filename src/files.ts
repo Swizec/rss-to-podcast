@@ -27,16 +27,8 @@ export async function mergeMP3Files(
             .on("end", () => {
                 resolve();
             })
-            .mergeToFile(outputFile, "./temp2"); // Specify a temporary directory for processing
+            .mergeToFile(outputFile, process.env.TEMP_DIR!); // Specify a temporary directory for processing
     });
-}
-
-export async function waitForFilesFlush(dir: string, files: string[]) {
-    let filesInDir: string[] = [];
-    do {
-        await Bun.sleep(1000);
-        filesInDir = (await readdir(dir)).map((f) => path.join(dir, f));
-    } while (!files.every((f) => filesInDir.includes(f)));
 }
 
 export async function cleanDir(dir: string) {
