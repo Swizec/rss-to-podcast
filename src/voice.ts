@@ -25,12 +25,16 @@ function chunkTextLines(lines: string[], maxChars: number = 4096): string[] {
     const chunks: string[] = [];
 
     for (const line of lines) {
-        if (currentChunk.length + line.length < maxChars) {
+        if (currentChunk.length + line.length > maxChars) {
             chunks.push(currentChunk);
             currentChunk = "";
         }
 
         currentChunk += line + "\n";
+    }
+
+    if (currentChunk.length > 0) {
+        chunks.push(currentChunk);
     }
 
     return chunks;
@@ -47,7 +51,7 @@ export async function markdownToVoice(tempDir: string, markdown: string) {
             // makes sure every chunk fits in the char limit
             const chunks = chunkTextLines(text.split("\n"));
 
-            for (let j = 0; i < chunks.length; j++) {
+            for (let j = 0; j < chunks.length; j++) {
                 const filename = path.join(
                     tempDir,
                     `markdownToVoice-${i}-${j}.mp3`

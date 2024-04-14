@@ -3,12 +3,14 @@ import { cleanDir, mergeMP3Files } from "./src/files";
 import { parseArgs } from "util";
 import { extract } from "@extractus/article-extractor";
 import slugify from "@sindresorhus/slugify";
+import natsort from "natsort";
 import { htmlToMarkdown } from "./src/markdown";
 
 async function processMarkdown(markdown: string, out: string) {
     await cleanDir(process.env.TEMP_DIR!);
 
     const files = await markdownToVoice(process.env.TEMP_DIR!, markdown);
+    files.sort(natsort());
 
     console.log("Merging files");
     await mergeMP3Files(files, out);

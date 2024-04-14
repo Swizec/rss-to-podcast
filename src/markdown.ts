@@ -7,14 +7,21 @@ import rehypeRemark from "rehype-remark";
 import { imageToText } from "./vision";
 
 async function imageNodeToText(node) {
-    const text = await imageToText(node.url, node.alt);
-    node.type = "paragraph";
-    node.children = [
-        {
-            type: "text",
-            value: `Embedded image: ${text} End image`,
-        },
-    ];
+    try {
+        const text = await imageToText(node.url, node.alt);
+        node.type = "paragraph";
+        node.children = [
+            {
+                type: "text",
+                value: `Embedded image: ${text} End image`,
+            },
+        ];
+    } catch (err) {
+        console.error(err);
+        console.log(node);
+        node.type = "paragraph";
+        node.children = [{ type: "text", value: "" }];
+    }
 }
 
 export function remarkImagesToText() {
@@ -83,6 +90,7 @@ export async function markdownSectionToText(section: MarkdownSection) {
         await unified()
             .use(remarkParse)
             .use(remarkImagesToText)
+            .use(remarkCodeSnippetsToText)
             .use(remarkStringify)
             .process(text)
     );
