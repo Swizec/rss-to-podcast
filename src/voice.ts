@@ -20,21 +20,43 @@ export async function textToVoice(text: string, filename: string) {
     await Bun.write(filename, buffer);
 }
 
+function chunkTextLines(lines: string[], maxChars: number = 4096): string[] {
+    let currentChunk = "";
+    const chunks: string[] = [];
+
+    for (const line of lines) {
+        if (currentChunk.length + line.length < maxChars) {
+            chunks.push(currentChunk);
+            currentChunk = "";
+        }
+
+        currentChunk += line + "\n";
+    }
+
+    return chunks;
+}
+
 export async function markdownToVoice(tempDir: string, markdown: string) {
     const sections = splitMarkdownByTitleAndImage(markdown);
     const files: string[] = [];
 
     await Promise.all(
         sections.map(async (section, i) => {
+            // textifies images and embeds
             const text = await markdownSectionToText(section);
+            // makes sure every chunk fits in the char limit
+            const chunks = chunkTextLines(text.split("\n"));
 
-            console.log(text.length);
+            for (let j = 0; i < chunks.length; j++) {
+                const filename = path.join(
+                    tempDir,
+                    `markdownToVoice-${i}-${j}.mp3`
+                );
+                console.log(filename);
 
-            const filename = path.join(tempDir, `markdownToVoice-${i}.mp3`);
-            console.log(filename);
-
-            await textToVoice(text, filename);
-            files.push(filename);
+                await textToVoice(text, filename);
+                files.push(filename);
+            }
         })
     );
 
